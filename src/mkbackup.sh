@@ -36,12 +36,18 @@
 #		Corrected infinite loop when used
 #		other options
 #
-#    - 1.3:
-#       Standardized output directory.
+#    	- 1.3:
+#       	Standardized output directory.
 #
-#   - 1.4:
-#       POSIX compliance.
+#   	- 1.4:
+#       	POSIX compliance.
 #
+#	- 1.5:
+#		Removed the option to define the name
+#		of the backup file (backup-<date>.tar.gz).
+#
+#		Started the creation of the incremental
+#		backup by using rsync.
 #==========================================================#
 
 
@@ -50,19 +56,24 @@
 
 #==========================================================| GLOBAL VARIABLES
 
-VERSION='1.4'
+VERSION='1.5'
 OUT_DIR="$HOME/.backup_files" 	# the backup will be sent to the home of the user
-NAME='backup.tar.gz'
+NAME="backup-$(date '+%Y-%m-%d').tar.gz"
+DELETE=false
 
 #==========================================================| TESTS
 
-[ ! -d "$OUT_DIR" ] && mkdir -p "$OUT_DIR"
+directory_exists() {
+	[ ! -d "$OUT_DIR" ] && mkdir -p "$OUT_DIR"
+}
+
+
 
 #==========================================================| FUNCTIONS
 
 help() {
 	cat <<'EOF'
-Usage: ./mkbackup [OPTIONS] [FILES]
+Usage: ./mkbackup [OPTIONS] FILES
 
 	Check the help menu with -h or send the files that will
 	be used for backup separated with space and inside (")
@@ -71,16 +82,24 @@ Usage: ./mkbackup [OPTIONS] [FILES]
 
 
 	OPTIONS:
-		-h | --help 	Shows the usage of the program
-		-v | --version	Shows the current version
-		-n | --name 	Defines the name of the output file
+		-h | --help 		Shows the usage of the program
+		-v | --version		Shows the current version
+		-C | --complete 	Make complete backup of files [Default]
+		-d | --delete		Incremental backup now mirrors the base files
+		-I | --incremental	Make incremental backup
 EOF
 }
 
-make_backup() {
+make_incremental_backup() {
+
+}
+
+make_complete_backup() {
 
 	# Verify if all the arguments points to valid files, otherwise exits with an error code
 	[ "$#" -eq "0" ] && { printf 'You must pass a command or files to backup\n' ; exit 1 ; }
+
+	directory_exists # Verify if the directory exists, if not, creates
 
 	for i in "$@"; do
 		if [ -e "$i" ]; then
@@ -112,13 +131,17 @@ while [ -n "$1" ]; do
 			shift
 		;;
 
-		-n|--name)
-			NAME="${2:-backup.tar}"
-			shift 2
+		-d|--delete)
+			DELETE=true
+			shift
+		;;
+
+		-I|--incremental)
+		
 		;;
 
 		*)
-			make_backup "$@"
+			make_complete_backup "$@"
 			break
 		;;
 
