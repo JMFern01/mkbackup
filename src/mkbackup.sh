@@ -36,11 +36,11 @@
 #		Corrected infinite loop when used
 #		other options
 #
-#    - 1.3:
-#       Standardized output directory.
+#    	- 1.3:
+#       	Standardized output directory.
 #
-#   - 1.4:
-#       POSIX compliance.
+#   	- 1.4:
+#       	POSIX compliance.
 #
 #==========================================================#
 
